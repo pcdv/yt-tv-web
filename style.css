@@ -7,6 +7,11 @@ html, body {
   overflow: hidden;
 }
 
+/* The native player shows its video on a surface behind the page. */
+html.native, html.native body {
+  background: transparent;
+}
+
 #player, #player iframe {
   position: fixed;
   inset: 0;

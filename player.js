@@ -1,10 +1,31 @@
-// Wrapper around the YouTube IFrame player.
+// The player of the page. On the TV the native player (no ads) comes first and the embedded
+// YouTube player is the fallback. In a browser only the embedded player exists.
 //
 // Events: "ended", "error" (code), "state" (playing: boolean), "title" (id, title).
+
+import { createNativePlayer, createSwitchingPlayer } from "./native-player.js";
 
 const API_URL = "https://www.youtube.com/iframe_api";
 
 export function createPlayer(elementId) {
+  const bridge = window.YtTvNative;
+  let hasNative = false;
+  try {
+    hasNative = !!(bridge && bridge.hasPlayer && bridge.hasPlayer());
+  } catch {
+    // no bridge: a browser
+  }
+  if (!hasNative) return createEmbeddedPlayer(elementId);
+  return createSwitchingPlayer({
+    native: createNativePlayer(bridge, window),
+    makeEmbedded: () => createEmbeddedPlayer(elementId),
+    // The native video shows on a surface behind the page, so the page must be transparent.
+    onMode: (native) => document.documentElement.classList.toggle("native", native),
+  });
+}
+
+/** Wrapper around the YouTube IFrame player. */
+export function createEmbeddedPlayer(elementId) {
   const handlers = {};
   let yt = null; // the YT.Player, once ready
   let pending = null; // a play() received before the player is ready
