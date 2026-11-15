@@ -220,6 +220,7 @@ function start() {
 window.yttv = {
   key,
   command: (obj) => commands.handle(obj),
+  state: () => ({ ok: true, state: commands.state() }),
 };
 
 renderIdle();
