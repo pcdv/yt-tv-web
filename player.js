@@ -62,16 +62,25 @@ export function createPlayer(elementId) {
     on(name, fn) {
       (handlers[name] = handlers[name] || []).push(fn);
     },
+    // The YouTube player confirms a change a moment later, by an onStateChange event. A command
+    // is answered at once, so playing() follows the request and the event corrects it if needed.
     play(id, start = 0) {
       currentId = id;
+      playing = true;
       if (!yt || !yt.loadVideoById) {
         pending = [id, start];
         return;
       }
       yt.loadVideoById({ videoId: id, startSeconds: start });
     },
-    pause: () => yt && yt.pauseVideo && yt.pauseVideo(),
-    resume: () => yt && yt.playVideo && yt.playVideo(),
+    pause() {
+      playing = false;
+      if (yt && yt.pauseVideo) yt.pauseVideo();
+    },
+    resume() {
+      playing = true;
+      if (yt && yt.playVideo) yt.playVideo();
+    },
     stop() {
       pending = null;
       playing = false;
