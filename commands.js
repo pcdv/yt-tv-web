@@ -1,13 +1,13 @@
 // The protocol: command in, answer out. No DOM: node tests it with a fake player.
 //
 // The player interface: play(id, start), pause(), resume(), stop(), seekBy(s), position(),
-// duration(), playing().
+// duration(), playing(). `settings` is a settings.js object.
 
 import { parseYouTube } from "./youtube-url.js";
 
 export const PROTOCOL = 1;
 
-export function createCommands({ store, player, name = "yt-tv" }) {
+export function createCommands({ store, player, settings, name = "yt-tv" }) {
   const ok = () => ({ ok: true, state: state() });
   const fail = (error) => ({ ok: false, error });
 
@@ -18,6 +18,7 @@ export function createCommands({ store, player, name = "yt-tv" }) {
       name,
       playing: !!cur && player.playing(),
       channel: "queue",
+      languages: settings.languages(),
       index: store.index(),
       current: cur && {
         id: cur.id,
@@ -82,6 +83,13 @@ export function createCommands({ store, player, name = "yt-tv" }) {
     seek: (c) => {
       if (typeof c.by !== "number" || !Number.isFinite(c.by)) return fail("seek needs a number of seconds");
       if (store.current()) player.seekBy(c.by);
+      return ok();
+    },
+    // applies to the next video: the playing one keeps its track
+    settings: (c) => {
+      if (c.languages !== undefined && !settings.setLanguages(c.languages)) {
+        return fail("languages must be a list of 1 to 10 language codes, or original");
+      }
       return ok();
     },
   };

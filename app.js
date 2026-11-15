@@ -1,6 +1,7 @@
 // Wiring: player, store, keys and the bridge to the native app.
 
 import { createStore } from "./store.js";
+import { createSettings } from "./settings.js";
 import { createCommands } from "./commands.js";
 import { createPlayer } from "./player.js";
 
@@ -24,10 +25,12 @@ function safeStorage() {
   }
 }
 
-const store = createStore(safeStorage());
-const player = createPlayer("player");
+const storage = safeStorage();
+const store = createStore(storage);
+const settings = createSettings(storage);
+const player = createPlayer("player", settings.languages);
 const info = nativeInfo();
-const commands = createCommands({ store, player, name: info.name });
+const commands = createCommands({ store, player, settings, name: info.name });
 
 // ---- idle screen ----
 

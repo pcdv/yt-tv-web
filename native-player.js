@@ -4,8 +4,12 @@
 // Both players here have the interface of player.js: play(id, start), pause, resume, stop,
 // seekBy, position, duration, playing, and the events "ended", "error", "state", "title".
 
-/** The native player. `bridge` is YtTvNative; the app calls `target.yttvNativeEvent`. */
-export function createNativePlayer(bridge, target) {
+/**
+ * The native player. `bridge` is YtTvNative; the app calls `target.yttvNativeEvent`.
+ * `languages()` gives the preferred audio languages, which the app receives with each video
+ * as a comma separated string.
+ */
+export function createNativePlayer(bridge, target, languages = () => []) {
   const handlers = {};
   const emit = (name, ...args) => (handlers[name] || []).forEach((fn) => fn(...args));
   target.yttvNativeEvent = (name, args) => emit(name, ...(args || []));
@@ -13,7 +17,13 @@ export function createNativePlayer(bridge, target) {
     on(name, fn) {
       (handlers[name] = handlers[name] || []).push(fn);
     },
-    play: (id, start = 0) => bridge.playerPlay(id, start),
+    play(id, start = 0) {
+      try {
+        bridge.playerPlay(id, start, languages().join(","));
+      } catch {
+        bridge.playerPlay(id, start); // an app from before the languages: two arguments
+      }
+    },
     pause: () => bridge.playerPause(),
     resume: () => bridge.playerResume(),
     stop: () => bridge.playerStop(),

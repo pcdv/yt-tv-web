@@ -7,7 +7,7 @@ import { createNativePlayer, createSwitchingPlayer } from "./native-player.js";
 
 const API_URL = "https://www.youtube.com/iframe_api";
 
-export function createPlayer(elementId) {
+export function createPlayer(elementId, languages = () => []) {
   const bridge = window.YtTvNative;
   let hasNative = false;
   try {
@@ -17,7 +17,7 @@ export function createPlayer(elementId) {
   }
   if (!hasNative) return createEmbeddedPlayer(elementId);
   return createSwitchingPlayer({
-    native: createNativePlayer(bridge, window),
+    native: createNativePlayer(bridge, window, languages),
     makeEmbedded: () => createEmbeddedPlayer(elementId),
     // The native video shows on a surface behind the page, so the page must be transparent.
     onMode: (native) => document.documentElement.classList.toggle("native", native),
