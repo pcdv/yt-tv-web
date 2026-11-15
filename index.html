@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>yt-tv</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="player"></div>
+
+  <div id="idle" class="screen" hidden>
+    <h1>yt-tv</h1>
+    <p>Share a YouTube link from your phone to play it here.</p>
+    <p class="address">TV: <span id="tv-name">browser</span> <span id="tv-address"></span></p>
+  </div>
+
+  <div id="banner" hidden>
+    <span id="banner-title"></span>
+    <span id="banner-meta"></span>
+  </div>
+
+  <div id="message" hidden></div>
+
+  <div id="power" class="screen" hidden>
+    <button id="power-button" type="button">Power on</button>
+  </div>
+
+  <form id="debug" hidden>
+    <textarea id="debug-text" rows="3" placeholder="Paste a YouTube link"></textarea>
+    <button type="button" data-cmd="play">Play</button>
+    <button type="button" data-cmd="queue">Queue</button>
+    <pre id="debug-answer"></pre>
+  </form>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
